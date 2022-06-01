@@ -1,0 +1,48 @@
+pipeline{
+    agent{ label 'npm' }
+    stages{
+        stage('Git Repo'){
+            steps{
+                git url: 'https://github.com/nmicht/create-nodejs-project.git',
+                branch: 'master'
+            }
+        }
+        stage ('Artifactory configuration') {
+            steps {
+                rtNpmDeployer (
+                    id: "NPM_DEPLOYER",
+                    serverId: "JFROG_LOCAL",
+                    repo: "default-npm-local"
+                )
+            }
+        }
+        stage ('Exec npm publish') {
+            steps {
+                rtNpmPublish (
+                    tool: NPM_LOCAL, // Tool name from Jenkins configuration
+                    deployerId: "NPM_DEPLOYER"
+                )
+            }
+        }
+    }    
+}
+ // stage('Run NPM'){
+        //     steps{
+        //         sh script: 'npm '
+        //     }
+        // }
+        // stage('Configure Artifactory'){
+        //     steps{
+        //         rtServer(
+        //             id: 'ARTIFACTORY_SERVER',
+        //             credentialsId: 'JFROG'
+        //             url: 'http:172.31.7.251:8082'
+        //         )
+        //         rtNpmDeployer (
+        //             id: "NPM_DEPLOYER",
+        //             serverId: "ARTIFACTORY_SERVER",
+        //             repo: ""
+        //         )
+        //     }
+        // }
+ 
